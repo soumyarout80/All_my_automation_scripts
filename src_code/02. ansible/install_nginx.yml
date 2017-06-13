@@ -1,0 +1,21 @@
+- name: NGINX | Installing NGINX repo rpm
+  yum:
+    name: http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+ 
+- name: NGINX | Installing NGINX On Centos
+  yum:
+    name: nginx
+    state: present
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: NGINX | Installing NGINX On Debian
+  apt:
+    name: nginx
+    state: latest
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  
+- name: NGINX | Starting NGINX
+  service:
+    name: nginx
+    state: started

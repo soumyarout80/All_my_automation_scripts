@@ -1,0 +1,3 @@
+- hosts: webservers
+  tasks:
+    - include: 'install_nginx.yml'
