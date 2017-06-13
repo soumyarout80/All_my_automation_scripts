@@ -2,7 +2,7 @@
 ##################################################
 # Name: capture-stats.sh
 # Description: Gather System Performance Statistics
-#
+# Author: Soumya Ranjan Rout
 ##################################################
 # Set  Script Variables
 #
