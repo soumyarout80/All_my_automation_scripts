@@ -1,0 +1,30 @@
+
+
+########################################### for files status check ###########################################
+
+host : appserver
+gether_facts: no
+become: yes
+
+tasks:
+  -name: Checking for file existance
+   stat: /path/to/file/{{item}}    #### Matching files in servers
+   with_items: cat /path/to/Customer_Override_properties.txt     ###Read file names from file
+   register: all_file     ##### Itiration of files
+
+  -name: NotexistFile
+   debug: "Path {{ item }} does not exist or isn't set properly"   ### Display msg if not exist
+   when: all_file.stat.exists == false  ### Condition checking for file exist
+
+
+
+
+  
+
+
+
+
+
+
+
+
