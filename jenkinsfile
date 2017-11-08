@@ -1,0 +1,56 @@
+/* Sample Jenkins pipeline script for EDGE POC - Shiva */
+
+pipeline {
+    agent { label 'master' }
+    stages{
+        stage('Project Build') {
+            steps {
+                sh 'echo "BLD_LABEL-"`date +%Y%m%d_%H%M` > bld_label.txt'
+                script {
+                    BUILD_LABEL = readFile('bld_label.txt')
+                }
+                sh "echo ${BUILD_LABEL}"
+                
+                // Get code from a git repository
+                git 'file:///var/www/git/spring-sample-app1.git'
+        
+                // Build Edge POC demo app
+                sh 'mvn compile'
+            }
+        }
+        
+        stage('Unit Test') {
+            steps {
+                // Build Edge POC demo app
+                sh """
+                    mvn package -D build.label=${BUILD_LABEL}
+                    """
+            }
+        }
+   
+        stage('Image-Build') {
+            steps {
+                // Build Edge POC demo app and push the image to local registry
+                sh """ 
+                    mvn package docker:build -D build.label=${BUILD_LABEL}
+                """
+                sh """
+                    docker push edge-dkr-registry:5000/spring-boot-session-redis:${BUILD_LABEL}
+                """
+            }
+        }
+        
+        
+        stage('Deploy') {
+            agent { label 'kube-master' }
+            steps {
+                // Build Edge POC demo app and push the image to local registry
+                 sh 'echo "Stopping and removing docker container"'
+                 sh 'docker rm -f edge-poc-java || true'
+                 sh """
+                    docker run -d -p 5080:8080 --link redis:redis --name edge-poc-java edge-dkr-registry:5000/spring-boot-session-redis:${BUILD_LABEL}
+                """
+            }
+        }
+    }
+}
